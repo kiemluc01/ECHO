@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 
-from app.api.routes import account, auth, health, inventory, players
+from app.api.routes import account, auth, health, inventory, players, quests
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -12,6 +12,7 @@ tags_metadata = [
 	{"name": "account", "description": "Authenticated account operations."},
 	{"name": "players", "description": "Character profile operations."},
 	{"name": "inventory", "description": "Inventory and wallet read APIs."},
+	{"name": "quests", "description": "Quest catalog and per-character progress."},
 ]
 
 app = FastAPI(
@@ -63,3 +64,4 @@ app.include_router(auth.router, prefix="/v1/auth", tags=["auth"])
 app.include_router(account.router, prefix="/v1", tags=["account"])
 app.include_router(players.router, prefix="/v1", tags=["players"])
 app.include_router(inventory.router, prefix="/v1", tags=["inventory"])
+app.include_router(quests.router, prefix="/v1", tags=["quests"])

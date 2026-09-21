@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 def account_response(account: Account) -> dict:
-    return {"id": account.id, "email": account.email, "provider": account.provider, "status": account.status, "roles": account.roles.split(",")}
+    return {"id": account.id, "email": account.email, "displayName": account.display_name, "provider": account.provider, "status": account.status, "roles": account.roles.split(",")}
 
 
 @router.get("/me")

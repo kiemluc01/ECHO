@@ -2,3 +2,7 @@
 .agent/
 .mcp.json
 CLAUDE.md
+.gitattributes
+backend/.venv/
+backend/.venv312/
+backend/*.pyc

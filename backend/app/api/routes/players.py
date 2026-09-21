@@ -20,7 +20,7 @@ def list_characters(account: Account = Depends(current_account), db: Session = D
 def create_character(payload: CharacterCreate, account: Account = Depends(current_account), db: Session = Depends(get_db)) -> dict:
     if db.scalar(select(Character).where(Character.name == payload.name)) is not None:
         raise HTTPException(status_code=409, detail={"code": "CHARACTER_NAME_TAKEN", "message": "Character name is already in use"})
-    character = Character(account_id=account.id, name=payload.name)
+    character = Character(account_id=account.id, name=payload.name, gender=payload.gender.value)
     db.add(character)
     db.commit()
     db.refresh(character)

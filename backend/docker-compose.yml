@@ -15,5 +15,44 @@ services:
       timeout: 5s
       retries: 10
 
+  migrate:
+    image: postgres:16-alpine
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: echo
+    volumes:
+      - ./migrations:/migrations:ro
+    entrypoint: ["sh", "-c"]
+    command: >-
+      "psql -h postgres -U echo -d echo -v ON_ERROR_STOP=1
+      -f /migrations/001_initial.sql
+      -f /migrations/002_local_auth.sql
+      -f /migrations/003_character_gender_quests.sql"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql+psycopg://echo:echo@postgres:5432/echo
+      JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-me}
+      JWT_ISSUER: ${JWT_ISSUER:-echo-api}
+      ACCESS_TOKEN_MINUTES: ${ACCESS_TOKEN_MINUTES:-15}
+      REFRESH_TOKEN_DAYS: ${REFRESH_TOKEN_DAYS:-30}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      APPLE_CLIENT_ID: ${APPLE_CLIENT_ID:-}
+      APPLE_CLIENT_SECRET: ${APPLE_CLIENT_SECRET:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
 volumes:
   echo-postgres:
